@@ -17,3 +17,5 @@ unzip test.zip
 unzip trainLabels.csv.zip
 
 rm -rf *.zip*
+
+wget https://storage.googleapis.com/kaggle-forum-message-attachments/90528/2877/retinopathy_solution.csv
