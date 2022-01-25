@@ -41,7 +41,7 @@ class Estimator():
         return recall_score(self.targets, self.pred, average='weighted')
         
     def get_fscore(self, digits=-1):
-        return f1_score(self.targets, self.pred, average='macro')
+        return f1_score(self.targets, self.pred, average='weighted')
     
     def reset(self):
         self.correct = 0
