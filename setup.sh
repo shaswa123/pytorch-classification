@@ -16,4 +16,4 @@ unzip test.zip
 
 unzip trainLabels.csv.zip
 
-rm -rf *.zip
+rm -rf *.zip*
