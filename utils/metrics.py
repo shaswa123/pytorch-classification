@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-
+from sklearn.metrics import f1_score, precision_score, recall_score
 
 class Estimator():
     def __init__(self, criterion, num_classes, thresholds=None):
@@ -20,6 +20,9 @@ class Estimator():
         self.correct += (predictions == targets).sum().item()
         for i, p in enumerate(predictions):
             self.conf_mat[int(targets[i])][int(p.item())] += 1
+            
+        self.targets = targets.data.cpu()
+        self.pred = predictions.data.cpu()
 
     def get_accuracy(self, digits=-1):
         acc = self.correct / self.num_samples
@@ -30,7 +33,16 @@ class Estimator():
         kappa = quadratic_weighted_kappa(self.conf_mat)
         kappa = kappa if digits == -1 else round(kappa, digits)
         return kappa
-
+    
+    def get_precision(self, digits=-1):
+        return precision_score(self.targets, self.pred, average='weighted')
+        
+    def get_recall(self, digits=-1):
+        return recall_score(self.targets, self.pred, average='weighted')
+        
+    def get_fscore(self, digits=-1):
+        return f1_score(self.targets, self.pred, average='macro')
+    
     def reset(self):
         self.correct = 0
         self.num_samples = 0
