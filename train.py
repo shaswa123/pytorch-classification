@@ -60,6 +60,9 @@ def train(cfg, model, train_dataset, val_dataset, estimator, logger=None):
             estimator.update(y_pred, y)
             avg_acc = estimator.get_accuracy(6)
             avg_kappa = estimator.get_kappa(6)
+            avg_precision = estimator.get_precision(6)
+            avg_recall = estimator.get_recall(6)
+            avg_fscore = estimator.get_fscore(6)
 
             # visualize samples
             if cfg.train.sample_view and step % cfg.train.sample_view_interval == 0:
@@ -68,8 +71,8 @@ def train(cfg, model, train_dataset, val_dataset, estimator, logger=None):
                 logger.add_image('input samples', samples, 0, dataformats='CHW')
 
             progress.set_description(
-                'epoch: [{} / {}], loss: {:.6f}, acc: {:.4f}, kappa: {:.4f}'
-                .format(epoch, cfg.train.epochs, avg_loss, avg_acc, avg_kappa)
+                'epoch: [{} / {}], loss: {:.6f}, acc: {:.4f}, kappa: {:.4f}, precision: {:.4f}, recall: {:.4f}, f1-score: {:.4f}'
+                .format(epoch, cfg.train.epochs, avg_loss, avg_acc, avg_kappa, avg_precision, avg_recall, avg_fscore)
             )
 
         # validation performance
@@ -77,10 +80,16 @@ def train(cfg, model, train_dataset, val_dataset, estimator, logger=None):
             eval(model, val_loader, cfg.train.criterion, estimator, device)
             acc = estimator.get_accuracy(6)
             kappa = estimator.get_kappa(6)
-            print('validation accuracy: {}, kappa: {}'.format(acc, kappa))
+            precision = estimator.get_precision(6)
+            recall = estimator.get_recall(6)
+            fscore = estimator.get_fscore(6)
+            print('validation accuracy: {}, kappa: {}, precision: {}, recall: {}, f1-score: {}'.format(acc, kappa, precision, recall, fscore))
             if logger:
                 logger.add_scalar('validation accuracy', acc, epoch)
                 logger.add_scalar('validation kappa', kappa, epoch)
+                logger.add_scalar('validation precision', precision, epoch)
+                logger.add_scalar('validation recall', recall, epoch)
+                logger.add_scalar('validation f1-score', fscore, epoch)
 
             # save model
             indicator = kappa if cfg.train.kappa_prior else acc
@@ -105,6 +114,9 @@ def train(cfg, model, train_dataset, val_dataset, estimator, logger=None):
             logger.add_scalar('training loss', avg_loss, epoch)
             logger.add_scalar('training accuracy', avg_acc, epoch)
             logger.add_scalar('training kappa', avg_kappa, epoch)
+            logger.add_scalar('training precision', avg_precision, epoch)
+            logger.add_scalar('training recall', avg_recall, epoch)
+            logger.add_scalar('training f1-score', avg_fscore, epoch)
             logger.add_scalar('learning rate', curr_lr, epoch)
 
     # save final model
